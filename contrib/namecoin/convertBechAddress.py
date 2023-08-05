@@ -25,12 +25,8 @@ if len (sys.argv) not in [2, 3]:
   sys.exit (-1);
 
 addr = sys.argv[1]
-if len (sys.argv) >= 3:
-  hrp = sys.argv[2]
-else:
-  hrp = "nc"
-
+hrp = sys.argv[2] if len (sys.argv) >= 3 else "nc"
 enc, oldHrp, data = segwit_addr.bech32_decode (addr)
-print ("Encoding %s, old HRP: %s" % (enc, oldHrp))
+print(f"Encoding {enc}, old HRP: {oldHrp}")
 newAddr = segwit_addr.bech32_encode (enc, hrp, data)
 print (newAddr)

@@ -13,7 +13,7 @@ class NameSendCoinsTest (NameTestFramework):
   def set_test_params (self):
     self.setup_name_test ([[]] * 1)
 
-  def verifyTx (self, txid, expected):
+  def verifyTx(self, txid, expected):
     """Verify that the given tx sends currency to the expected recipients."""
 
     txData = self.nodes[0].gettransaction (txid)
@@ -30,7 +30,7 @@ class NameSendCoinsTest (NameTestFramework):
       if 'nameOp' in out['scriptPubKey']:
         continue
       addr = out['scriptPubKey']['address']
-      if not addr in expected:
+      if addr not in expected:
         # This must be the change address.  Through the assertion above about
         # the expected sizes, we make sure that the test fails if there is
         # not exactly one key with this property.

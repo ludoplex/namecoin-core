@@ -20,9 +20,9 @@ class NameWalletTest (NameTestFramework):
   spentA = zero
   spentB = zero
 
-  def set_test_params (self):
+  def set_test_params(self):
     self.setup_clean_chain = True
-    self.setup_name_test ([["-paytxfee=%s" % txFee, "-allowexpired"]] * 2)
+    self.setup_name_test([[f"-paytxfee={txFee}", "-allowexpired"]] * 2)
 
   def generateToOther (self, ind, n):
     """
@@ -72,7 +72,7 @@ class NameWalletTest (NameTestFramework):
     self.checkBalance (0, self.spentA)
     self.checkBalance (1, self.spentB)
 
-  def checkTx (self, ind, txid, amount, fee, details):
+  def checkTx(self, ind, txid, amount, fee, details):
     """
     Calls 'gettransaction' and compares the result to the
     expected data given in the arguments.  "details" is an array
@@ -105,10 +105,7 @@ class NameWalletTest (NameTestFramework):
       else:
         # None is not sortable in Python3, so use "none" instead.
         nameOp = "none"
-      if 'fee' in d:
-        fee = d['fee']
-      else:
-        fee = None
+      fee = d['fee'] if 'fee' in d else None
       detailsGot.append ([d['category'], nameOp, d['amount'], fee])
 
     # Compare.  Sort to get rid of differences in the order.

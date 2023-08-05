@@ -19,7 +19,7 @@ class NameMultiUpdateTest (NameTestFramework):
     self.setup_clean_chain = True
     self.setup_name_test ([["-debug", "-namehistory", "-limitnamechains=10"]])
 
-  def run_test (self):
+  def run_test(self):
     self.node = self.nodes[0]
     self.generate (self.node, 110)
 
@@ -38,8 +38,7 @@ class NameMultiUpdateTest (NameTestFramework):
     assert_equal (self.node.name_pending (), [])
 
     # Build two update transactions building on each other.
-    txn = []
-    txn.append (self.node.name_update (name, "third"))
+    txn = [self.node.name_update(name, "third")]
     txn.append (self.node.name_update (name, "fourth"))
 
     # Check that both are in the mempool.

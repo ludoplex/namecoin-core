@@ -13,18 +13,14 @@ class NameListUnspentTest (NameTestFramework):
   def set_test_params (self):
     self.setup_name_test ([["-allowexpired"]] * 2)
 
-  def lookupName (self, ind, name, **kwargs):
+  def lookupName(self, ind, name, **kwargs):
     """Wrapper around lookup that gets txid and vout from the name."""
 
     pending = self.nodes[ind].name_pending (name)
-    if len (pending) > 0:
-      data = pending[0]
-    else:
-      data = self.nodes[ind].name_show (name)
-
+    data = pending[0] if len (pending) > 0 else self.nodes[ind].name_show (name)
     return self.lookup (ind, data['txid'], data['vout'], **kwargs)
 
-  def lookup (self, ind, txid, vout,
+  def lookup(self, ind, txid, vout,
               addressFilter=None,
               allowUnconfirmed=False,
               includeNames=False):
@@ -33,19 +29,14 @@ class NameListUnspentTest (NameTestFramework):
     the txid:vout combination or None.
     """
 
-    minConf = 1
-    if allowUnconfirmed:
-      minConf = 0
-
+    minConf = 0 if allowUnconfirmed else 1
     opt = {"includeNames": includeNames}
     res = self.nodes[ind].listunspent (minConf, None, addressFilter, None, opt)
 
-    for out in res:
-      if (out['txid'], out['vout']) == (txid, vout):
-        return out
-    return None
+    return next(
+        (out for out in res if (out['txid'], out['vout']) == (txid, vout)), None)
 
-  def run_test (self):
+  def run_test(self):
 
     # Create a name new for testing.  Figure out the vout by looking at the
     # raw transaction.
@@ -53,11 +44,11 @@ class NameListUnspentTest (NameTestFramework):
     new = self.nodes[0].name_new ("testname", {"destAddress": addrA})
     txid = new[0]
     raw = self.nodes[0].getrawtransaction (txid, 1)
-    vout = None
-    for i in range (len (raw['vout'])):
-      if 'nameOp' in raw['vout'][i]['scriptPubKey']:
-        vout = i
-        break
+    vout = next(
+        (i for i in range(len(raw['vout']))
+         if 'nameOp' in raw['vout'][i]['scriptPubKey']),
+        None,
+    )
     assert vout is not None
 
     # Check expected behaviour for listunspent with the unconfirmed name_new.
