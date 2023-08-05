@@ -43,9 +43,12 @@ class NameEncodingsTest (NameTestFramework):
     self.setup_clean_chain = True
     self.setup_name_test ([["-namehistory"]])
 
-  def setEncodings (self, nameEnc='ascii', valueEnc='ascii'):
-    args = ["-nameencoding=%s" % nameEnc, "-valueencoding=%s" % valueEnc]
-    args.append ("-namehistory")
+  def setEncodings(self, nameEnc='ascii', valueEnc='ascii'):
+    args = [
+        f"-nameencoding={nameEnc}",
+        f"-valueencoding={valueEnc}",
+        "-namehistory",
+    ]
     self.restart_node (0, extra_args=args)
 
     self.nameEncoding = nameEnc
@@ -336,7 +339,7 @@ class NameEncodingsTest (NameTestFramework):
     self.test_walletTx ()
     self.test_rpcOption ()
 
-  def test_outputSide (self):
+  def test_outputSide(self):
     """
     Tests encodings purely on the output-side.  This test registers some
     names/values using hex encoding, and then verifies how those names look like
@@ -390,7 +393,7 @@ class NameEncodingsTest (NameTestFramework):
     txAscii = self.node.decoderawtransaction (txHex)
     found = False
     for out in txAscii['vout']:
-      if not 'nameOp' in out['scriptPubKey']:
+      if 'nameOp' not in out['scriptPubKey']:
         continue
 
       assert not found
@@ -409,7 +412,7 @@ class NameEncodingsTest (NameTestFramework):
       assert_equal (script['nameOp'], op)
     assert found
 
-  def testNameForWalletTx (self, baseName, enc, msgFmt):
+  def testNameForWalletTx(self, baseName, enc, msgFmt):
     """
     Registers a name and then verifies that the value returned from
     gettransaction / listtransactions as "name operation" matches
@@ -430,7 +433,7 @@ class NameEncodingsTest (NameTestFramework):
 
     data = self.node.gettransaction (txid)
     assert_equal (len (data['details']), 1)
-    assert_equal (data['details'][0]['name'], "update: %s" % updMsg)
+    assert_equal(data['details'][0]['name'], f"update: {updMsg}")
 
     found = False
     for tx in self.node.listtransactions ():
@@ -438,7 +441,7 @@ class NameEncodingsTest (NameTestFramework):
         continue
       assert not found
       found = True
-      assert_equal (tx['name'], "update: %s" % updMsg)
+      assert_equal(tx['name'], f"update: {updMsg}")
     assert found
 
   def test_walletTx (self):

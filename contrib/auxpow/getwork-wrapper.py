@@ -32,14 +32,13 @@ class GetworkWrapper:
   coming in.
   """
 
-  def __init__ (self, backend, host, port):
+  def __init__(self, backend, host, port):
     self.backend = backend
     self.server = SimpleJSONRPCServer ((host, port))
 
-    def getwork (data=None):
-      if data is None:
-        return self.createWork ()
-      return self.submitWork (data)
+    def getwork(data=None):
+      return self.createWork () if data is None else self.submitWork (data)
+
     self.server.register_function (getwork)
 
     # We use our own extra nonce to not return the same work twice if
@@ -61,7 +60,7 @@ class GetworkWrapper:
 
     return data[2*36 : 2*68]
 
-  def createWork (self):
+  def createWork(self):
     auxblock = self.backend.getauxblock ()
     (tx, hdr) = auxpow.constructAuxpow (auxblock['hash'])
 
@@ -69,7 +68,7 @@ class GetworkWrapper:
     self.extraNonce = (self.extraNonce + 1) % (1 << 32)
 
     hdrBytes = bytearray (codecs.decode (hdr, 'hex_codec'))
-    hdrBytes[0:4] = struct.pack ('<I', en)
+    hdrBytes[:4] = struct.pack ('<I', en)
     formatted = auxpow.getworkByteswap (hdrBytes)
     formatted += bytearray ([0] * (128 - len (formatted)))
     formatted[83] = 0x80
@@ -81,9 +80,9 @@ class GetworkWrapper:
 
     return {"data": work, "target": auxblock['_target']}
 
-  def submitWork (self, data):
+  def submitWork(self, data):
     key = self.keyForWork (data)
-    if not key in self.works:
+    if key not in self.works:
       print ('Error: stale / unknown work submitted')
       return False
     w = self.works[key]
@@ -96,7 +95,7 @@ class GetworkWrapper:
     try:
       res = self.backend.submitauxblock (w['auxblock']['hash'], auxpowHex)
     except ProtocolError as exc:
-      print ('Error submitting work: %s' % exc)
+      print(f'Error submitting work: {exc}')
       return False
 
     # Clear cache of created works when a new block was accepted.

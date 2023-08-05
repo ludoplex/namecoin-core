@@ -85,7 +85,7 @@ class NamePsbtTest (NameTestFramework):
     assert res is not None
     return res
 
-  def rawNameOp (self, ind, nameIn, toAddr, op):
+  def rawNameOp(self, ind, nameIn, toAddr, op):
     """
     Utility method to construct and send a name-operation transaction with
     the PSBT interface.  It uses the provided input (if not None)
@@ -107,7 +107,7 @@ class NamePsbtTest (NameTestFramework):
         vout.append ({changeAddr: u["amount"] - fee - nameAmount})
         break
 
-    assert len (vin) > 0, "found no suitable funding input"
+    assert vin, "found no suitable funding input"
 
     if nameIn is not None:
       vin.append (nameIn)

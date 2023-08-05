@@ -335,44 +335,6 @@ class MempoolAcceptanceTest(BitcoinTestFramework):
 
         # FIXME: Enable once Namecoin has BIP68 enabled.
         return
-        self.log.info('A transaction that is locked by BIP68 sequence logic')
-        tx = tx_from_hex(raw_tx_reference)
-        tx.vin[0].nSequence = 2  # We could include it in the second block mined from now, but not the very next one
-        self.check_mempool_result(
-            result_expected=[{'txid': tx.rehash(), 'allowed': False, 'reject-reason': 'non-BIP68-final'}],
-            rawtxs=[tx.serialize().hex()],
-            maxfeerate=0,
-        )
-
-        # Prep for tiny-tx tests with wsh(OP_TRUE) output
-        seed_tx = self.wallet.send_to(from_node=node, scriptPubKey=script_to_p2wsh_script(CScript([OP_TRUE])), amount=COIN)
-        self.generate(node, 1)
-
-        self.log.info('A tiny transaction(in non-witness bytes) that is disallowed')
-        tx = CTransaction()
-        tx.vin.append(CTxIn(COutPoint(int(seed_tx["txid"], 16), seed_tx["sent_vout"]), b"", SEQUENCE_FINAL))
-        tx.wit.vtxinwit = [CTxInWitness()]
-        tx.wit.vtxinwit[0].scriptWitness.stack = [CScript([OP_TRUE])]
-        tx.vout.append(CTxOut(0, CScript([OP_RETURN] + ([OP_0] * (MIN_PADDING - 2)))))
-        # Note it's only non-witness size that matters!
-        assert_equal(len(tx.serialize_without_witness()), 64)
-        assert_equal(MIN_STANDARD_TX_NONWITNESS_SIZE - 1, 64)
-        assert_greater_than(len(tx.serialize()), 64)
-
-        self.check_mempool_result(
-            result_expected=[{'txid': tx.rehash(), 'allowed': False, 'reject-reason': 'tx-size-small'}],
-            rawtxs=[tx.serialize().hex()],
-            maxfeerate=0,
-        )
-
-        self.log.info('Minimally-small transaction(in non-witness bytes) that is allowed')
-        tx.vout[0] = CTxOut(COIN - 1000, DUMMY_MIN_OP_RETURN_SCRIPT)
-        assert_equal(len(tx.serialize_without_witness()), MIN_STANDARD_TX_NONWITNESS_SIZE)
-        self.check_mempool_result(
-            result_expected=[{'txid': tx.rehash(), 'allowed': True, 'vsize': tx.get_vsize(), 'fees': { 'base': Decimal('0.00001000')}}],
-            rawtxs=[tx.serialize().hex()],
-            maxfeerate=0,
-        )
 
 if __name__ == '__main__':
     MempoolAcceptanceTest().main()

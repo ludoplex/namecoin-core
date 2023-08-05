@@ -14,7 +14,7 @@ class NameIsMineTest (NameTestFramework):
     self.setup_clean_chain = True
     self.setup_name_test ([[], ['-namehistory']])
 
-  def verifyExpectedIsMineInList (self, arr):
+  def verifyExpectedIsMineInList(self, arr):
     """
     Goes through the array of name info, as returned by name_scan or name_list.
     It verifies that exactly the two expected names are there, and the
@@ -29,7 +29,7 @@ class NameIsMineTest (NameTestFramework):
       elif n['name'] == "d/b":
         assert_equal (n['ismine'], False)
       else:
-        raise AssertionError ("Unexpected name in array: %s" % n['name'])
+        raise AssertionError(f"Unexpected name in array: {n['name']}")
 
   def run_test (self):
     self.node = self.nodes[1]

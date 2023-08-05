@@ -210,7 +210,7 @@ class NameMultisigTest (NameTestFramework):
     self.generate (self.nodes[1], 1)
     self.checkName (1, "name", "changed", None, False)
 
-  def test_namescript_p2sh (self):
+  def test_namescript_p2sh(self):
     """
     Tests how name prefixes interact with P2SH outputs and redeem scripts.
     """
@@ -288,11 +288,8 @@ class NameMultisigTest (NameTestFramework):
     self.generate (node, 1)
     self.checkNameWithHeight (0, name, "value2", baseHeight + 2)
 
-    found = False
-    for u in node.listunspent ():
-      if u['address'] == addr and u['amount'] == 1:
-        found = True
-        break
+    found = any(u['address'] == addr and u['amount'] == 1
+                for u in node.listunspent())
     if not found:
       raise AssertionError ("Coin not sent to expected address")
 

@@ -15,7 +15,7 @@ class NameReorgTest (NameTestFramework):
     self.setup_clean_chain = True
     self.setup_name_test ([["-namehistory"]])
 
-  def run_test (self):
+  def run_test(self):
     node = self.nodes[0]
     self.generate (node, 200)
 
@@ -64,7 +64,7 @@ class NameReorgTest (NameTestFramework):
 
     # Mine another block.  This should at least perform the
     # non-conflicting transactions.
-    assert_equal (set (node.getrawmempool ()), set ([txidA, txidC]))
+    assert_equal(set (node.getrawmempool ()), {txidA, txidC})
     self.generate (node, 1)
     self.checkName (0, "a", "changed value", None, False)
     self.checkName (0, "b", "b long", None, False)

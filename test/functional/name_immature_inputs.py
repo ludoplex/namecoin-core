@@ -16,20 +16,16 @@ class NameImmatureInputsTest (NameTestFramework):
     # the test.
     self.setup_name_test ([["-debug=names"]] * 2)
 
-  def dependsOn (self, ind, child, parent):
+  def dependsOn(self, ind, child, parent):
     """
     Checks whether the child transaction (given by txid) depends on an output
     from the parent txid.
     """
 
     child = self.nodes[ind].getrawtransaction (child, 1)
-    for vin in child['vin']:
-      if vin['txid'] == parent:
-        return True
+    return any(vin['txid'] == parent for vin in child['vin'])
 
-    return False
-
-  def run_test (self):
+  def run_test(self):
 
     # The first part of this test registers a name using the standard RPC
     # interface.  This should work as soon as the name_new has at least one
@@ -69,7 +65,7 @@ class NameImmatureInputsTest (NameTestFramework):
     assert signed['complete']
     first = self.nodes[0].sendrawtransaction (signed['hex'])
 
-    assert_equal (set ([new[0], first]), set (self.nodes[0].getrawmempool ()))
+    assert_equal({new[0], first}, set (self.nodes[0].getrawmempool ()))
     self.nodes[0].getblocktemplate ({'rules': ['segwit']})
     self.generate (self.nodes[0], 1)
     assert_equal ([first], self.nodes[0].getrawmempool ())

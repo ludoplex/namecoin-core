@@ -46,7 +46,7 @@ class AuxpowMiningTest (BitcoinTestFramework):
     self.test_getauxblock ()
     self.test_create_submit_auxblock ()
 
-  def test_common (self, create, submit):
+  def test_common(self, create, submit):
     """
     Common test code that is shared between the tests for getauxblock and the
     createauxblock / submitauxblock method pair.
@@ -148,7 +148,7 @@ class AuxpowMiningTest (BitcoinTestFramework):
       blk = self.nodes[1].getblock (auxblock['hash'])
       tx = self.nodes[1].getrawtransaction (blk['tx'][0], True, blk['hash'])
       coinbase = tx['vin'][0]['coinbase']
-      assert_equal ("02%02x00" % auxblock['height'], coinbase[0 : 6])
+      assert_equal("02%02x00" % auxblock['height'], coinbase[:6])
 
   def test_getauxblock (self):
     """

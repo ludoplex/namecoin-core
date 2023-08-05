@@ -31,9 +31,9 @@ class AuxpowStats:
   found in the blockchain.
   """
 
-  def __init__ (self):
-    self.merkleLength = dict ()
-    self.txSize = dict ()
+  def __init__(self):
+    self.merkleLength = {}
+    self.txSize = {}
     self.maxMerkle = 0
     self.maxTxSize = 0
 
@@ -92,11 +92,7 @@ class AuxpowStats:
 
 rpc = jsonrpc.proxy.ServiceProxy (url)
 tips = rpc.getchaintips ()
-tip = None
-for t in tips:
-  if t['status'] == 'active':
-    tip = t
-    break
+tip = next((t for t in tips if t['status'] == 'active'), None)
 assert tip is not None
 
 stats = AuxpowStats ()
